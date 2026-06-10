@@ -1230,33 +1230,73 @@ footer{
         </div>
       </div>
     </div>
-    <div class="contact-form">
-      <div class="cf-title">Send Us a Message</div>
-      <div class="form-row">
-        <div class="fg"><label>First Name</label><input type="text" placeholder="John"></div>
-        <div class="fg"><label>Last Name</label><input type="text" placeholder="Smith"></div>
-      </div>
-      <div class="fg"><label>Email Address</label><input type="email" placeholder="john@yourcompany.com"></div>
-      <div class="fg"><label>Business Name</label><input type="text" placeholder="Acme Co."></div>
-      <div class="fg">
-        <label>Service Needed</label>
-        <select>
-          <option value="">Select a service</option>
-          <option>New Website (Starter)</option>
-          <option>New Website (Professional)</option>
-          <option>New Website (Enterprise)</option>
-          <option>E-Commerce Store</option>
-          <option>Website Redesign</option>
-          <option>SEO & Performance</option>
-          <option>Maintenance Plan</option>
-          <option>Not Sure Yet</option>
-        </select>
-      </div>
-      <div class="fg"><label>Tell us about your project</label><textarea rows="4" placeholder="What does your business do? What kind of website are you looking for? Any examples you love?"></textarea></div>
-      <button class="btn-primary" style="width:100%;justify-content:center;display:flex;" onclick="submitContact()">Send Message →</button>
-      <div id="contact-confirm" style="display:none;margin-top:1rem;padding:1rem;background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.3);font-family:var(--mono);font-size:0.78rem;color:var(--blue-glow);letter-spacing:0.06em;">
-        ✓ Message received — we'll be in touch within 1 business day.
-      </div>
+    <form
+  class="contact-form"
+  action="https://formspree.io/f/YOUR_FORM_ID"
+  method="POST"
+>
+  <div class="cf-title">Send Us a Message</div>
+
+  <div class="form-row">
+    <div class="fg">
+      <label>First Name</label>
+      <input type="text" name="first_name" placeholder="John" required>
+    </div>
+
+    <div class="fg">
+      <label>Last Name</label>
+      <input type="text" name="last_name" placeholder="Smith" required>
+    </div>
+  </div>
+
+  <div class="fg">
+    <label>Email Address</label>
+    <input
+      type="email"
+      name="email"
+      placeholder="john@yourcompany.com"
+      required
+    >
+  </div>
+
+  <div class="fg">
+    <label>Business Name</label>
+    <input type="text" name="business_name" placeholder="Acme Co.">
+  </div>
+
+  <div class="fg">
+    <label>Service Needed</label>
+    <select name="service">
+      <option value="">Select a service</option>
+      <option>New Website (Starter)</option>
+      <option>New Website (Professional)</option>
+      <option>New Website (Enterprise)</option>
+      <option>E-Commerce Store</option>
+      <option>Website Redesign</option>
+      <option>SEO & Performance</option>
+      <option>Maintenance Plan</option>
+      <option>Not Sure Yet</option>
+    </select>
+  </div>
+
+  <div class="fg">
+    <label>Tell us about your project</label>
+    <textarea
+      name="project_details"
+      rows="4"
+      placeholder="What does your business do? What kind of website are you looking for?"
+      required
+    ></textarea>
+  </div>
+
+  <button
+    type="submit"
+    class="btn-primary"
+    style="width:100%;justify-content:center;display:flex;"
+  >
+    Send Message →
+  </button>
+</form>
     </div>
   </div>
 </section>
