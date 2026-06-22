@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thoe Website Construction</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --black:#06090f;
+  --dark:#0b1120;
+  --panel:#111827;
+  --panel2:#161f30;
+  --border:#1e2d45;
+  --border2:#243352;
+  --blue:#2563eb;
+  --blue-bright:#3b82f6;
+  --blue-glow:#60a5fa;
+  --blue-pale:#dbeafe;
+  --grey:#8b9ab5;
+  --grey-light:#c8d3e8;
+  --white:#f0f4ff;
+  --white-pure:#ffffff;
+  --mono:'IBM Plex Mono',monospace;
+}
+
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Outfit',sans-serif;font-weight:300;
+  background:var(--black);color:var(--white);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CUSTOM CURSOR */
+#cursor{
+  position:fixed;width:10px;height:10px;
+  background:var(--blue-bright);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width 0.15s,height 0.15s,opacity 0.15s;
+  mix-blend-mode:screen;
+}
+#cursor-ring{
+  position:fixed;width:34px;height:34px;
+  border:1px solid rgba(59,130,246,0.5);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:transform 0.08s,width 0.2s,height 0.2s,border-color 0.2s;
+}
+body:hover #cursor{opacity:1;}
+
+/* GRID OVERLAY */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;z-index:0;
+}
+
+/* NOISE */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  opacity:0.4;pointer-events:none;z-index:0;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 3rem;height:64px;
+  background:rgba(6,9,15,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:0.75rem;
+  text-decoration:none;
+}
+.logo-mark{
+  width:32px;height:32px;
+  background:var(--blue);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.logo-mark::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent);
+}
+.logo-text{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;
+  color:var(--white-pure);letter-spacing:-0.01em;
+}
+.logo-text span{color:var(--blue-bright);}
+.nav-links{display:flex;gap:0.25rem;list-style:none;align-items:center;}
+.nav-links a{
+  color:var(--grey);text-decoration:none;
+  font-size:0.82rem;font-weight:400;letter-spacing:0.04em;
+  padding:0.4rem 0.9rem;
+  transition:color 0.2s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:50%;right:50%;
+  height:1px;background:var(--blue-bright);
+  transition:left 0.2s,right 0.2s;
+}
+.nav-links a:hover{color:var(--white-pure);}
+.nav-links a:hover::after{left:0.9rem;right:0.9rem;}
+.nav-cta{
+  background:var(--blue);color:var(--white-pure)!important;
+  padding:0.5rem 1.25rem!important;
+  font-weight:500!important;
+  letter-spacing:0.06em!important;
+  transition:background 0.2s,box-shadow 0.2s!important;
+}
+.nav-cta::after{display:none!important;}
+.nav-cta:hover{background:var(--blue-bright)!important;box-shadow:0 0 20px rgba(59,130,246,0.4)!important;}
+
+/* HERO */
+#home{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:80px 3rem 3rem;
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+.hero-glow{
+  position:absolute;top:-20%;left:50%;transform:translateX(-50%);
+  width:800px;height:600px;
+  background:radial-gradient(ellipse,rgba(37,99,235,0.15) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-family:var(--mono);font-size:0.72rem;
+  color:var(--blue-bright);letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:2rem;
+  animation:fadeUp 0.6s ease both;
+}
+.hero-tag::before{
+  content:'';width:24px;height:1px;background:var(--blue-bright);
+}
+.hero-tag-dot{
+  width:6px;height:6px;background:var(--blue-bright);
+  border-radius:50%;animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+h1{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(3rem,7vw,6.5rem);
+  line-height:0.95;letter-spacing:-0.03em;
+  color:var(--white-pure);
+  margin-bottom:2rem;
+  animation:fadeUp 0.6s 0.1s ease both;
+}
+h1 .line2{color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.25);}
+h1 .accent{color:var(--blue-bright);}
+
+.hero-desc{
+  font-size:1.1rem;color:var(--grey);
+  max-width:55ch;line-height:1.8;
+  margin-bottom:3rem;
+  animation:fadeUp 0.6s 0.2s ease both;
+}
+.hero-actions{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  animation:fadeUp 0.6s 0.3s ease both;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  background:var(--blue);color:var(--white-pure);
+  padding:0.85rem 2rem;
+  font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:500;letter-spacing:0.06em;
+  text-decoration:none;border:none;cursor:none;
+  transition:background 0.2s,box-shadow 0.2s,transform 0.15s;
+  position:relative;overflow:hidden;
+}
+.btn-primary::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  transform:translateX(-100%);
+  transition:transform 0.5s;
+}
+.btn-primary:hover::before{transform:translateX(100%);}
+.btn-primary:hover{background:var(--blue-bright);box-shadow:0 0 30px rgba(59,130,246,0.5);transform:translateY(-2px);}
+
+.btn-outline{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  background:transparent;color:var(--grey-light);
+  padding:0.85rem 2rem;
+  font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:400;letter-spacing:0.06em;
+  text-decoration:none;border:1px solid var(--border2);cursor:none;
+  transition:border-color 0.2s,color 0.2s,background 0.2s;
+}
+.btn-outline:hover{border-color:var(--blue-bright);color:var(--white-pure);background:rgba(59,130,246,0.06);}
+
+.hero-stats{
+  display:flex;gap:3rem;margin-top:5rem;
+  padding-top:2.5rem;
+  border-top:1px solid var(--border);
+  animation:fadeUp 0.6s 0.4s ease both;
+}
+.hero-stat-num{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:2.2rem;
+  color:var(--white-pure);display:block;
+}
+.hero-stat-label{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--grey);letter-spacing:0.12em;text-transform:uppercase;
+}
+
+/* HERO VISUAL */
+.hero-visual{
+  position:absolute;right:3rem;top:50%;transform:translateY(-50%);
+  width:420px;
+  animation:fadeUp 0.8s 0.3s ease both;
+}
+.code-window{
+  background:var(--panel);
+  border:1px solid var(--border);
+  overflow:hidden;
+  box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(59,130,246,0.1);
+}
+.code-titlebar{
+  background:var(--panel2);
+  padding:0.7rem 1rem;
+  display:flex;align-items:center;gap:0.5rem;
+  border-bottom:1px solid var(--border);
+}
+.code-dot{width:10px;height:10px;border-radius:50%;}
+.code-title{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--grey);margin-left:auto;
+}
+.code-body{padding:1.25rem 1.5rem;font-family:var(--mono);font-size:0.78rem;line-height:1.8;}
+.c-grey{color:#64748b;}
+.c-blue{color:#60a5fa;}
+.c-green{color:#34d399;}
+.c-purple{color:#a78bfa;}
+.c-white{color:#f8fafc;}
+.c-orange{color:#fb923c;}
+.type-cursor{display:inline-block;width:2px;height:1em;background:var(--blue-bright);animation:blink 1s infinite;vertical-align:text-bottom;margin-left:1px;}
+
+/* SERVICES */
+#services{
+  padding:7rem 3rem;
+  position:relative;z-index:1;
+}
+.section-header{max-width:1200px;margin:0 auto 4rem;}
+.section-label{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--blue-bright);letter-spacing:0.2em;text-transform:uppercase;
+  margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;
+}
+.section-label::before{content:'//';color:var(--border2);}
+h2{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(2rem,4vw,3.5rem);
+  color:var(--white-pure);letter-spacing:-0.03em;line-height:1.05;
+}
+h2 em{font-style:normal;color:var(--blue-bright);}
+.section-sub{
+  font-size:1rem;color:var(--grey);margin-top:1rem;max-width:50ch;line-height:1.8;
+}
+
+.services-tabs{max-width:1200px;margin:0 auto;}
+.stab-nav{
+  display:flex;gap:0;
+  border-bottom:1px solid var(--border);
+  margin-bottom:0;
+  overflow-x:auto;
+}
+.stab-btn{
+  background:none;border:none;cursor:none;
+  padding:0.85rem 1.75rem;
+  font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:400;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--grey);
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color 0.2s,border-color 0.2s;
+  white-space:nowrap;
+}
+.stab-btn.active{color:var(--blue-bright);border-bottom-color:var(--blue-bright);}
+.stab-btn:hover{color:var(--white);}
+
+.stab-panels{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-top:none;
+  min-height:380px;
+}
+.stab-panel{display:none;padding:3rem;}
+.stab-panel.active{display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:center;}
+.stab-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.75rem;
+  color:var(--white-pure);margin-bottom:1rem;letter-spacing:-0.02em;
+}
+.stab-body{color:var(--grey);line-height:1.85;margin-bottom:2rem;font-size:0.95rem;}
+.stab-tags{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.tag{
+  font-family:var(--mono);font-size:0.7rem;
+  background:rgba(37,99,235,0.1);
+  border:1px solid rgba(37,99,235,0.25);
+  color:var(--blue-glow);
+  padding:0.25rem 0.75rem;letter-spacing:0.06em;
+}
+.stab-visual{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  padding:2rem;
+}
+.feature-list{display:flex;flex-direction:column;gap:0.85rem;}
+.feature-item{
+  display:flex;align-items:center;gap:0.85rem;
+  font-size:0.88rem;color:var(--grey-light);
+}
+.feature-check{
+  width:20px;height:20px;flex-shrink:0;
+  background:rgba(37,99,235,0.15);
+  border:1px solid var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;color:var(--blue-bright);
+}
+
+/* PROCESS */
+#process{
+  padding:7rem 3rem;
+  background:var(--dark);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+#process::before{
+  content:'';position:absolute;
+  left:50%;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--border),transparent);
+  transform:translateX(-50%);
+}
+.process-inner{max-width:1200px;margin:0 auto;}
+.process-steps{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;margin-top:4rem;
+  position:relative;
+}
+.process-step{
+  padding:2.5rem;
+  border:1px solid transparent;
+  transition:border-color 0.3s,background 0.3s;
+  position:relative;
+}
+.process-step:hover{border-color:var(--border);background:rgba(17,24,39,0.6);}
+.step-num{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--blue);letter-spacing:0.2em;
+  margin-bottom:1rem;
+}
+.step-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;
+  color:var(--white-pure);margin-bottom:0.75rem;
+}
+.step-body{font-size:0.88rem;color:var(--grey);line-height:1.8;}
+.step-num-big{
+  position:absolute;top:1.5rem;right:2rem;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:4rem;
+  color:rgba(37,99,235,0.06);line-height:1;
+  pointer-events:none;
+}
+
+/* PORTFOLIO */
+#work{padding:7rem 3rem;position:relative;z-index:1;}
+.work-inner{max-width:1200px;margin:0 auto;}
+.work-filter{
+  display:flex;gap:0.5rem;flex-wrap:wrap;
+  margin:2.5rem 0;
+}
+.filter-btn{
+  background:transparent;border:1px solid var(--border);
+  color:var(--grey);font-family:'Outfit',sans-serif;
+  font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;
+  padding:0.45rem 1.1rem;cursor:none;
+  transition:all 0.2s;
+}
+.filter-btn.active,
+.filter-btn:hover{
+  background:var(--blue);border-color:var(--blue);
+  color:var(--white-pure);
+}
+.work-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+}
+.work-card{
+  background:var(--panel);
+  padding:2.5rem;
+  position:relative;overflow:hidden;
+  transition:background 0.3s;
+  cursor:none;
+}
+.work-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(37,99,235,0.08),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.work-card:hover{background:var(--panel2);}
+.work-card:hover::before{opacity:1;}
+.work-cat{
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--blue-bright);letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.work-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;
+  color:var(--white-pure);margin-bottom:0.75rem;
+}
+.work-desc{font-size:0.85rem;color:var(--grey);line-height:1.7;margin-bottom:1.5rem;}
+.work-tech{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.work-tag{
+  font-family:var(--mono);font-size:0.62rem;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  color:var(--grey);padding:0.15rem 0.6rem;
+}
+.work-arrow{
+  position:absolute;top:2rem;right:2rem;
+  width:32px;height:32px;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--grey);font-size:0.8rem;
+  opacity:0;transform:translateY(4px);
+  transition:opacity 0.2s,transform 0.2s,border-color 0.2s;
+}
+.work-card:hover .work-arrow{opacity:1;transform:translateY(0);border-color:var(--blue-bright);color:var(--blue-bright);}
+
+/* PRICING */
+#pricing{
+  padding:7rem 3rem;
+  background:var(--dark);
+  border-top:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.pricing-inner{max-width:1100px;margin:0 auto;}
+.pricing-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);
+  margin-top:4rem;
+}
+.price-card{
+  background:var(--panel);padding:2.5rem;
+  position:relative;overflow:hidden;
+  transition:background 0.3s;
+}
+.price-card.featured{
+  background:var(--panel2);
+  border-top:2px solid var(--blue);
+}
+.price-badge{
+  font-family:var(--mono);font-size:0.65rem;
+  background:var(--blue);color:var(--white-pure);
+  padding:0.2rem 0.75rem;letter-spacing:0.1em;text-transform:uppercase;
+  display:inline-block;margin-bottom:1.5rem;
+}
+.price-tier{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--blue-bright);letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:0.75rem;
+}
+.price-amount{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:2.75rem;color:var(--white-pure);
+  letter-spacing:-0.04em;
+  margin-bottom:0.25rem;
+  display:flex;align-items:flex-start;gap:0.15rem;
+}
+.price-amount sup{font-size:1.25rem;margin-top:0.4rem;}
+.price-from{font-family:var(--mono);font-size:0.65rem;color:var(--grey);margin-bottom:2rem;}
+.price-features{list-style:none;margin-bottom:2rem;}
+.price-features li{
+  display:flex;align-items:center;gap:0.75rem;
+  padding:0.55rem 0;border-bottom:1px solid var(--border);
+  font-size:0.88rem;color:var(--grey-light);
+}
+.price-features li:last-child{border-bottom:none;}
+.price-check{color:var(--blue-bright);font-size:0.75rem;flex-shrink:0;}
+.price-x{color:#475569;font-size:0.75rem;flex-shrink:0;}
+.price-features li.off{color:#475569;}
+
+/* TESTIMONIALS */
+#testimonials{padding:7rem 3rem;position:relative;z-index:1;}
+.test-inner{max-width:1100px;margin:0 auto;}
+.test-slider{position:relative;margin-top:4rem;}
+.test-track{display:flex;gap:1.5rem;overflow:hidden;}
+.test-card{
+  background:var(--panel);border:1px solid var(--border);
+  padding:2.5rem;flex:0 0 calc(50% - 0.75rem);
+  position:relative;
+}
+.test-card::before{
+  content:'"';
+  font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;
+  color:rgba(37,99,235,0.1);
+  position:absolute;top:1rem;right:2rem;line-height:1;
+}
+.test-text{
+  font-size:0.95rem;color:var(--grey-light);line-height:1.9;
+  margin-bottom:2rem;font-style:italic;
+}
+.test-author{display:flex;align-items:center;gap:1rem;}
+.test-avatar{
+  width:40px;height:40px;
+  background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:0.9rem;
+  color:var(--white-pure);flex-shrink:0;
+}
+.test-name{font-family:'Syne',sans-serif;font-weight:600;font-size:0.88rem;color:var(--white-pure);}
+.test-role{font-family:var(--mono);font-size:0.68rem;color:var(--grey);letter-spacing:0.06em;}
+.test-controls{display:flex;gap:0.5rem;margin-top:2rem;}
+.test-btn{
+  width:36px;height:36px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--grey);font-size:0.9rem;cursor:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.test-btn:hover{background:var(--blue);border-color:var(--blue);color:var(--white-pure);}
+
+/* FAQ */
+#faq{
+  padding:7rem 3rem;
+  background:var(--dark);
+  border-top:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.faq-inner{max-width:800px;margin:0 auto;}
+.faq-list{margin-top:3.5rem;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 0;cursor:none;
+  font-family:'Syne',sans-serif;font-weight:600;font-size:1rem;
+  color:var(--white-pure);
+  transition:color 0.2s;
+}
+.faq-q:hover{color:var(--blue-bright);}
+.faq-icon{
+  width:28px;height:28px;
+  border:1px solid var(--border2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--grey);font-size:1.2rem;line-height:1;
+  transition:transform 0.3s,border-color 0.2s,color 0.2s;
+}
+.faq-item.open .faq-icon{transform:rotate(45deg);border-color:var(--blue-bright);color:var(--blue-bright);}
+.faq-a{
+  max-height:0;overflow:hidden;
+  transition:max-height 0.35s ease,padding 0.35s;
+  font-size:0.9rem;color:var(--grey);line-height:1.9;
+}
+.faq-item.open .faq-a{max-height:200px;padding-bottom:1.5rem;}
+
+/* ABOUT */
+#about{
+  padding:7rem 3rem;
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+#about::before{
+  content:'';position:absolute;
+  top:-10%;left:-5%;
+  width:500px;height:500px;
+  background:radial-gradient(ellipse,rgba(37,99,235,0.07),transparent 70%);
+  pointer-events:none;
+}
+.about-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1.1fr;
+  gap:6rem;align-items:center;
+}
+.about-visual{position:relative;}
+.about-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:2.5rem;
+  position:relative;
+  overflow:hidden;
+}
+.about-card::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--blue-glow),transparent);
+}
+.about-avatar-photo{
+  width:120px;height:120px;
+  object-fit:cover;object-position:center top;
+  border-radius:50%;
+  display:block;
+  margin-bottom:1.5rem;
+  border:3px solid var(--blue);
+  box-shadow:0 0 0 5px rgba(37,99,235,0.15), 0 0 28px rgba(37,99,235,0.3);
+}
+.about-name{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;
+  color:var(--white-pure);letter-spacing:-0.02em;
+  margin-bottom:0.25rem;
+}
+.about-role{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--blue-bright);letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:1.5rem;
+}
+.about-card-divider{
+  height:1px;background:var(--border);margin:1.5rem 0;
+}
+.about-stat-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+  margin-bottom:1.5rem;
+}
+.about-mini-stat{}
+.about-mini-num{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;
+  color:var(--white-pure);display:block;
+}
+.about-mini-label{
+  font-family:var(--mono);font-size:0.63rem;
+  color:var(--grey);letter-spacing:0.1em;text-transform:uppercase;
+}
+.about-linkedin-btn{
+  display:flex;align-items:center;gap:0.75rem;
+  background:rgba(37,99,235,0.08);
+  border:1px solid var(--blue);
+  color:var(--blue-bright);
+  padding:0.75rem 1.25rem;
+  font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:500;
+  text-decoration:none;
+  transition:background 0.2s,box-shadow 0.2s,color 0.2s;
+  letter-spacing:0.04em;
+}
+.about-linkedin-btn:hover{
+  background:var(--blue);color:var(--white-pure);
+  box-shadow:0 0 20px rgba(37,99,235,0.35);
+}
+.about-linkedin-icon{
+  width:20px;height:20px;flex-shrink:0;
+}
+.about-floating-tag{
+  position:absolute;bottom:-1rem;right:-1rem;
+  background:var(--panel2);border:1px solid var(--border);
+  padding:0.75rem 1.25rem;
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--blue-bright);letter-spacing:0.1em;
+}
+.about-content .section-label{margin-bottom:0.75rem;}
+.about-content h2{margin-bottom:1.5rem;}
+.about-content p{
+  font-size:0.97rem;color:var(--grey);
+  line-height:1.9;margin-bottom:1.25rem;
+}
+.about-traits{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0.75rem;margin-top:2rem;
+}
+.about-trait{
+  display:flex;align-items:flex-start;gap:0.75rem;
+  padding:1rem;
+  border:1px solid var(--border);
+  background:rgba(17,24,39,0.4);
+  transition:border-color 0.2s,background 0.2s;
+}
+.about-trait:hover{border-color:var(--blue);background:rgba(37,99,235,0.05);}
+.about-trait-icon{
+  width:28px;height:28px;flex-shrink:0;
+  background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;color:var(--blue-bright);
+}
+.about-trait-text{
+  font-size:0.83rem;color:var(--grey-light);line-height:1.5;
+}
+.about-trait-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;
+  color:var(--white-pure);margin-bottom:0.2rem;
+}
+
+/* CONTACT */
+#contact{
+  padding:7rem 3rem;
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+#contact::before{
+  content:'';position:absolute;
+  bottom:-20%;right:-10%;
+  width:600px;height:600px;
+  background:radial-gradient(ellipse,rgba(37,99,235,0.1),transparent 70%);
+  pointer-events:none;
+}
+.contact-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;}
+.contact-info h3{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:2rem;
+  color:var(--white-pure);margin-bottom:1.5rem;letter-spacing:-0.02em;
+}
+.contact-info p{color:var(--grey);font-size:0.95rem;line-height:1.9;margin-bottom:2rem;}
+.contact-items{display:flex;flex-direction:column;gap:1.25rem;}
+.contact-item{
+  display:flex;align-items:center;gap:1rem;
+  padding:1rem 1.25rem;
+  border:1px solid var(--border);
+  transition:border-color 0.2s;
+}
+.contact-item:hover{border-color:var(--blue);}
+.ci-icon{
+  width:36px;height:36px;
+  background:rgba(37,99,235,0.1);
+  border:1px solid rgba(37,99,235,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.ci-label{font-family:var(--mono);font-size:0.65rem;color:var(--grey);letter-spacing:0.1em;text-transform:uppercase;}
+.ci-val{font-size:0.9rem;color:var(--grey-light);margin-top:0.1rem;}
+
+.contact-form{background:var(--panel);border:1px solid var(--border);padding:2.5rem;}
+.cf-title{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;
+  color:var(--white-pure);margin-bottom:2rem;
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.fg{margin-bottom:1.25rem;}
+.fg label{
+  display:block;font-family:var(--mono);font-size:0.65rem;
+  color:var(--grey);letter-spacing:0.12em;text-transform:uppercase;
+  margin-bottom:0.45rem;
+}
+.fg input,
+.fg select,
+.fg textarea{
+  width:100%;background:var(--panel2);
+  border:1px solid var(--border);
+  color:var(--grey-light);
+  padding:0.75rem 1rem;
+  font-family:'Outfit',sans-serif;font-size:0.9rem;
+  outline:none;
+  transition:border-color 0.2s;
+  resize:vertical;
+}
+.fg input:focus,
+.fg select:focus,
+.fg textarea:focus{border-color:var(--blue-bright);}
+.fg input::placeholder,
+.fg textarea::placeholder{color:#2d3f58;}
+.fg select option{background:var(--panel);}
+
+/* FOOTER */
+footer{
+  background:var(--dark);
+  border-top:1px solid var(--border);
+  padding:3rem 3rem 2rem;
+  position:relative;z-index:1;
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:3rem;margin-bottom:3rem;
+}
+.footer-brand p{color:var(--grey);font-size:0.85rem;line-height:1.8;margin-top:1rem;max-width:28ch;}
+.footer-col h4{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--blue-bright);letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:1.25rem;
+}
+.footer-col ul{list-style:none;}
+.footer-col li{margin-bottom:0.6rem;}
+.footer-col a{
+  font-size:0.85rem;color:var(--grey);text-decoration:none;
+  transition:color 0.2s;
+}
+.footer-col a:hover{color:var(--white-pure);}
+.footer-bottom{
+  border-top:1px solid var(--border);
+  padding-top:1.75rem;
+  display:flex;justify-content:space-between;align-items:center;
+  max-width:1200px;margin:0 auto;
+}
+.footer-bottom p{font-family:var(--mono);font-size:0.7rem;color:#2d3f58;letter-spacing:0.06em;}
+.footer-social{display:flex;gap:0.5rem;}
+.social-btn{
+  width:32px;height:32px;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--grey);font-size:0.8rem;text-decoration:none;
+  transition:all 0.2s;
+}
+.social-btn:hover{border-color:var(--blue);color:var(--blue-bright);background:rgba(37,99,235,0.1);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.7s,transform 0.7s;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px;}
+
+/* TYPING ANIMATION */
+@keyframes typeIn{from{width:0;}to{width:100%;}}
+
+/* HAMBURGER BUTTON */
+.nav-hamburger{
+  display:none;flex-direction:column;gap:5px;
+  background:none;border:none;cursor:pointer;padding:6px;
+  z-index:1001;flex-shrink:0;
+}
+.nav-hamburger span{
+  display:block;width:22px;height:2px;
+  background:var(--grey-light);
+  transition:all 0.25s ease;
+}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.nav-hamburger.open span:nth-child(2){opacity:0;}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ================================================================
+   RESPONSIVE — TABLET (≤1024px)
+   ================================================================ */
+@media(max-width:1024px){
+  /* Hero visual hidden; hero goes full-width */
+  .hero-visual{display:none;}
+  #home{padding:80px 2rem 3rem;}
+  .hero-stats{gap:2rem;flex-wrap:wrap;}
+
+  /* Services tab panel: stack on tablet */
+  .stab-panel.active{grid-template-columns:1fr;gap:2rem;}
+
+  /* Process 2-col stays but tighten */
+  #process{padding:5rem 2rem;}
+
+  /* Portfolio 2-col on tablet */
+  .work-grid{grid-template-columns:repeat(2,1fr);}
+
+  /* Pricing 1-col scroll on tablet */
+  .pricing-grid{grid-template-columns:1fr;gap:1px;}
+
+  /* Testimonials: show 1 card */
+  .test-card{flex:0 0 100%;}
+
+  /* Contact: stack */
+  .contact-inner{grid-template-columns:1fr;gap:3rem;}
+
+  /* Footer: 2-col */
+  .footer-inner{grid-template-columns:1fr 1fr;gap:2.5rem;}
+
+  /* Section padding */
+  #services,#work,#testimonials,#faq,#contact{padding:5rem 2rem;}
+  #pricing{padding:5rem 2rem;}
+}
+
+/* ================================================================
+   RESPONSIVE — MOBILE (≤640px)
+   ================================================================ */
+@media(max-width:640px){
+  /* Disable custom cursor on touch devices */
+  #cursor,#cursor-ring{display:none;}
+  body{cursor:auto;}
+  .btn-primary,.btn-outline,.filter-btn,.stab-btn,
+  .faq-q,.test-btn,.nav-cta{cursor:pointer;}
+
+  /* NAV */
+  nav{padding:0 1.25rem;height:58px;}
+  .nav-hamburger{display:flex;}
+  .nav-links{
+    display:none;
+    position:absolute;top:58px;left:0;right:0;
+    flex-direction:column;
+    background:rgba(6,9,15,0.98);
+    border-bottom:1px solid var(--border);
+    padding:0.5rem 0 1.25rem;
+    gap:0;list-style:none;
+  }
+  .nav-links.open{display:flex;}
+  .nav-links li{width:100%;}
+  .nav-links a{
+    display:block;padding:0.85rem 1.5rem;
+    font-size:0.9rem;letter-spacing:0.04em;
+    border-bottom:1px solid rgba(30,45,69,0.5);
+  }
+  .nav-links a::after{display:none;}
+  .nav-cta{
+    margin:0.75rem 1.25rem 0!important;
+    text-align:center;
+    border-bottom:none!important;
+  }
+
+  /* HERO */
+  #home{padding:74px 1.25rem 3rem;min-height:auto;}
+  .hero-glow{width:300px;height:300px;}
+  h1{font-size:clamp(2.4rem,11vw,3.5rem);margin-bottom:1.5rem;}
+  .hero-desc{font-size:0.95rem;margin-bottom:2rem;}
+  .hero-actions{flex-direction:column;gap:0.75rem;}
+  .hero-actions .btn-primary,
+  .hero-actions .btn-outline{width:100%;justify-content:center;}
+  .hero-stats{gap:1.25rem;margin-top:3rem;flex-wrap:wrap;}
+  .hero-stat-num{font-size:1.75rem;}
+
+  /* SERVICES */
+  #services{padding:4rem 1.25rem;}
+  .stab-nav{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .stab-btn{padding:0.75rem 1rem;font-size:0.75rem;}
+  .stab-panel{padding:1.5rem!important;}
+  .stab-panel.active{grid-template-columns:1fr;gap:1.5rem;}
+
+  /* PROCESS */
+  #process{padding:4rem 1.25rem;}
+  #process::before{display:none;}
+  .process-steps{grid-template-columns:1fr;}
+  .process-step{padding:1.75rem 1.25rem;}
+
+  /* PORTFOLIO */
+  #work{padding:4rem 1.25rem;}
+  .work-grid{grid-template-columns:1fr;}
+  .work-filter{gap:0.4rem;}
+  .filter-btn{font-size:0.72rem;padding:0.4rem 0.85rem;}
+
+  /* PRICING */
+  #pricing{padding:4rem 1.25rem;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .price-card{padding:2rem 1.5rem;}
+
+  /* TESTIMONIALS */
+  #testimonials{padding:4rem 1.25rem;}
+  .test-card{flex:0 0 100%;padding:2rem 1.5rem;}
+  .test-slider{overflow:hidden;}
+
+  /* FAQ */
+  #faq{padding:4rem 1.25rem;}
+  .faq-q{font-size:0.9rem;padding:1.25rem 0;}
+
+  /* ABOUT */
+  #about{padding:4rem 1.25rem;}
+  .about-inner{grid-template-columns:1fr;gap:2.5rem;}
+  .about-traits{grid-template-columns:1fr;}
+  .about-floating-tag{display:none;}
+  .about-stat-row{grid-template-columns:1fr 1fr;}
+
+  /* CONTACT */
+  #contact{padding:4rem 1.25rem;}
+  .contact-inner{grid-template-columns:1fr;gap:2rem;}
+  .contact-form{padding:1.75rem 1.25rem;}
+  .form-row{grid-template-columns:1fr;}
+  .contact-info h3{font-size:1.6rem;}
+
+  /* FOOTER */
+  footer{padding:2.5rem 1.25rem 1.5rem;}
+  .footer-inner{grid-template-columns:1fr;gap:2rem;margin-bottom:2rem;}
+  .footer-bottom{flex-direction:column;gap:1rem;text-align:center;}
+
+  /* SECTION HEADERS */
+  .section-header{margin-bottom:2.5rem;}
+  h2{font-size:clamp(1.75rem,8vw,2.5rem);}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#home" class="nav-logo">
+    <div class="logo-mark"></div>
+    <div class="logo-text">TWC<span>.</span>com</div>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#services" class="nav-link-item">Services</a></li>
+    <li><a href="#process" class="nav-link-item">Process</a></li>
+    <li><a href="#work" class="nav-link-item">Work</a></li>
+    <li><a href="#pricing" class="nav-link-item">Pricing</a></li>
+    <li><a href="#faq" class="nav-link-item">FAQ</a></li>
+    <li><a href="#about" class="nav-link-item">About</a></li>
+    <li><a href="#contact" class="nav-cta nav-link-item">Get a Quote</a></li>
+  </ul>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      Available for new projects
+    </div>
+    <h1>
+      We Build<br>
+      <span class="line2">Websites</span><br>
+      That <span class="accent">Convert.</span>
+    </h1>
+    <p class="hero-desc">
+      Custom-built, high-performance websites for businesses ready to stand out. 
+      From sleek landing pages to full-scale web applications — we engineer the digital presence you deserve.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Start a Project →</a>
+      <a href="#work" class="btn-outline">View Our Work</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <span class="hero-stat-num">2</span>
+        <span class="hero-stat-label">Projects In Progress</span>
+      </div>
+      <div>
+        <span class="hero-stat-num">NA%</span>
+        <span class="hero-stat-label">Client Satisfaction</span>
+      </div>
+      <div>
+        <span class="hero-stat-num">7–10</span>
+        <span class="hero-stat-label">Day Turnaround</span>
+      </div>
+      <div>
+        <span class="hero-stat-num">24/7</span>
+        <span class="hero-stat-label">Support Included</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="code-window">
+      <div class="code-titlebar">
+        <div class="code-dot" style="background:#ff5f56"></div>
+        <div class="code-dot" style="background:#ffbd2e"></div>
+        <div class="code-dot" style="background:#27c93f"></div>
+        <span class="code-title">thoe.config.js</span>
+      </div>
+      <div class="code-body">
+        <div><span class="c-purple">const</span> <span class="c-blue">site</span> = {</div>
+        <div>&nbsp;&nbsp;<span class="c-green">name</span>: <span class="c-orange">"Your Business"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-green">design</span>: <span class="c-orange">"pixel-perfect"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-green">performance</span>: <span class="c-blue">100</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-green">mobile</span>: <span class="c-purple">true</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-green">seo</span>: <span class="c-purple">true</span>,</div>
+        <div>&nbsp;&nbsp;<span class="c-green">launch</span>: <span class="c-orange">"14 days"</span></div>
+        <div>}</div>
+        <div style="margin-top:0.5rem;"><span class="c-grey">// Ready to ship</span></div>
+        <div><span class="c-purple">export default</span> <span class="c-blue">site</span><span class="type-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header reveal">
+    <div class="section-label">What We Do</div>
+    <h2>Our <em>Services</em></h2>
+    <p class="section-sub">From concept to launch, we handle every pixel and every line of code.</p>
+  </div>
+  <div class="services-tabs reveal">
+    <div class="stab-nav">
+      <button class="stab-btn active" onclick="showTab('web')">Web Design</button>
+      <button class="stab-btn" onclick="showTab('dev')">Development</button>
+      <button class="stab-btn" onclick="showTab('ecom')">E-Commerce</button>
+      <button class="stab-btn" onclick="showTab('seo')">SEO & Speed</button>
+      <button class="stab-btn" onclick="showTab('maint')">Maintenance</button>
+    </div>
+    <div class="stab-panels">
+
+      <div class="stab-panel active" id="tab-web">
+        <div>
+          <div class="stab-title">Custom Web Design</div>
+          <p class="stab-body">We design visually stunning, brand-aligned websites that aren't just beautiful — they're built to turn visitors into customers. No templates. No cookie-cutter layouts. Every design is crafted from scratch for your business and your audience.</p>
+          <div class="stab-tags">
+            <span class="tag">UI/UX Design</span>
+            <span class="tag">Responsive Layout</span>
+            <span class="tag">Brand Identity</span>
+            <span class="tag">Figma Mockups</span>
+            <span class="tag">Animations</span>
+          </div>
+        </div>
+        <div class="stab-visual">
+          <div class="feature-list">
+            <div class="feature-item"><span class="feature-check">✓</span>Custom design — no templates</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Mobile-first, fully responsive</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Brand-consistent color & typography</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Smooth animations & interactions</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Unlimited revisions until approved</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Delivered in 7–14 business days</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stab-panel" id="tab-dev">
+        <div>
+          <div class="stab-title">Full-Stack Development</div>
+          <p class="stab-body">Beyond the visuals, we build robust, scalable web applications with clean, maintainable code. Whether you need a contact form, a booking system, or a full custom web app, we've got the engineering muscle to make it happen.</p>
+          <div class="stab-tags">
+            <span class="tag">HTML / CSS / JS</span>
+            <span class="tag">React</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">APIs</span>
+            <span class="tag">Databases</span>
+          </div>
+        </div>
+        <div class="stab-visual">
+          <div class="feature-list">
+            <div class="feature-item"><span class="feature-check">✓</span>Fast-loading, optimized code</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Custom functionality & integrations</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Secure form & database handling</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Third-party API connections</div>
+            <div class="feature-item"><span class="feature-check">✓</span>CMS integration (if needed)</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Full source code ownership</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stab-panel" id="tab-ecom">
+        <div>
+          <div class="stab-title">E-Commerce Solutions</div>
+          <p class="stab-body">Launch your online store with a shopping experience that's smooth, secure, and built to sell. From product pages to checkout, we design and build stores that make buying easy and look incredible on every device.</p>
+          <div class="stab-tags">
+            <span class="tag">Shopify</span>
+            <span class="tag">WooCommerce</span>
+            <span class="tag">Custom Cart</span>
+            <span class="tag">Payment Gateway</span>
+            <span class="tag">Inventory</span>
+          </div>
+        </div>
+        <div class="stab-visual">
+          <div class="feature-list">
+            <div class="feature-item"><span class="feature-check">✓</span>Full product catalog setup</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Secure checkout & payments</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Inventory & order management</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Mobile-optimized shopping</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Discount codes & promotions</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Analytics & conversion tracking</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stab-panel" id="tab-seo">
+        <div>
+          <div class="stab-title">SEO & Performance</div>
+          <p class="stab-body">A beautiful website means nothing if no one finds it. We optimize every site for lightning-fast load speeds and search engine visibility — so you rank higher, load faster, and convert more visitors from day one.</p>
+          <div class="stab-tags">
+            <span class="tag">On-Page SEO</span>
+            <span class="tag">Core Web Vitals</span>
+            <span class="tag">Google Analytics</span>
+            <span class="tag">Speed Audit</span>
+            <span class="tag">Schema Markup</span>
+          </div>
+        </div>
+        <div class="stab-visual">
+          <div class="feature-list">
+            <div class="feature-item"><span class="feature-check">✓</span>100 Google PageSpeed score target</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Meta tags, titles & descriptions</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Image compression & lazy loading</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Sitemap & robots.txt setup</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Google Analytics + Search Console</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Monthly performance reporting</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stab-panel" id="tab-maint">
+        <div>
+          <div class="stab-title">Ongoing Maintenance</div>
+          <p class="stab-body">Your website is a living asset — it needs care. We offer flexible maintenance plans to keep your site secure, updated, and performing at its peak. Think of us as your on-call web team, whenever you need us.</p>
+          <div class="stab-tags">
+            <span class="tag">Updates & Patches</span>
+            <span class="tag">Backups</span>
+            <span class="tag">Uptime Monitoring</span>
+            <span class="tag">Content Updates</span>
+            <span class="tag">Security</span>
+          </div>
+        </div>
+        <div class="stab-visual">
+          <div class="feature-list">
+            <div class="feature-item"><span class="feature-check">✓</span>Weekly automated backups</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Security monitoring & patches</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Uptime monitoring (99.9% SLA)</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Content & image updates</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Monthly performance report</div>
+            <div class="feature-item"><span class="feature-check">✓</span>Priority support response</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="process-inner">
+    <div class="section-header reveal">
+      <div class="section-label">How It Works</div>
+      <h2>Our <em>Process</em></h2>
+      <p class="section-sub">Simple, transparent, and built around your timeline.</p>
+    </div>
+    <div class="process-steps">
+      <div class="process-step reveal">
+        <div class="step-num">// 01</div>
+        <div class="step-title">Discovery Call</div>
+        <p class="step-body">We start with a free 30-minute call to understand your business, goals, audience, and timeline. No pressure — just a real conversation about what you need.</p>
+        <div class="step-num-big">01</div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">// 02</div>
+        <div class="step-title">Proposal & Scope</div>
+        <p class="step-body">We deliver a clear, itemized proposal within 24 hours. Fixed pricing, defined deliverables, and a project timeline — no surprise invoices, ever.</p>
+        <div class="step-num-big">02</div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">// 03</div>
+        <div class="step-title">Design & Build</div>
+        <p class="step-body">We design first, then build. You'll see mockups before a single line of code is written. Feedback is welcomed at every stage with unlimited revisions.</p>
+        <div class="step-num-big">03</div>
+      </div>
+      <div class="process-step reveal">
+        <div class="step-num">// 04</div>
+        <div class="step-title">Launch & Support</div>
+        <p class="step-body">Once you're happy, we handle the full launch — domain, hosting, SSL, and going live. Then we stick around with 60 days of free post-launch support.</p>
+        <div class="step-num-big">04</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-inner">
+    <!-- Visual / Profile Card -->
+    <div class="about-visual reveal">
+      <div class="about-card">
+        <img src="data:image/jpeg;base64,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" alt="Zach Thoe" class="about-avatar-photo">
+        <div class="about-name">Zach Thoe</div>
+        <div class="about-role">Founder &amp; Lead Developer</div>
+        <div class="about-card-divider"></div>
+        <div class="about-stat-row">
+          <div class="about-mini-stat">
+            <span class="about-mini-num">Iowa</span>
+            <span class="about-mini-label">Based In</span>
+          </div>
+          <div class="about-mini-stat">
+            <span class="about-mini-num">7–10d</span>
+            <span class="about-mini-label">Avg. Launch</span>
+          </div>
+          <div class="about-mini-stat">
+            <span class="about-mini-num">TWC</span>
+            <span class="about-mini-label">Founder</span>
+          </div>
+          <div class="about-mini-stat">
+            <span class="about-mini-num">24/7</span>
+            <span class="about-mini-label">Support</span>
+          </div>
+        </div>
+        <div class="about-card-divider"></div>
+        <a href="https://www.linkedin.com/in/zach-thoe-4a96573a8/" target="_blank" rel="noopener" class="about-linkedin-btn">
+          <svg class="about-linkedin-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          View LinkedIn Profile
+        </a>
+        <div class="about-floating-tag">// Ventura, Iowa</div>
+      </div>
+    </div>
+    <!-- Content -->
+    <div class="about-content reveal">
+      <div class="section-label">The Person Behind TWC</div>
+      <h2>Built by Someone Who <em>Gets It</em></h2>
+      <p>
+        I'm Zach Thoe, the founder of Thoe Website Construction. I started TWC with a simple belief: small and mid-size businesses deserve the same quality of web presence as the big players — without the agency price tag or the runaround.
+      </p>
+      <p>
+        Based in Ventura, Iowa, I work directly with every client from the first call to launch day. No hand-offs, no account managers — just a developer who cares about your results and treats your project like it's his own.
+      </p>
+      <p>
+        When you work with TWC, you're working with me. That means fast communication, honest timelines, and a website built to perform.
+      </p>
+      <div class="about-traits">
+        <div class="about-trait">
+          <div class="about-trait-icon">✦</div>
+          <div>
+            <div class="about-trait-title">Direct Communication</div>
+            <div class="about-trait-text">You talk to the builder, not a middleman.</div>
+          </div>
+        </div>
+        <div class="about-trait">
+          <div class="about-trait-icon">⚡</div>
+          <div>
+            <div class="about-trait-title">Fast Turnarounds</div>
+            <div class="about-trait-text">Most sites launched in 7–10 business days.</div>
+          </div>
+        </div>
+        <div class="about-trait">
+          <div class="about-trait-icon">◈</div>
+          <div>
+            <div class="about-trait-title">Locally Rooted</div>
+            <div class="about-trait-text">Proud Iowa-based business, serving clients nationwide.</div>
+          </div>
+        </div>
+        <div class="about-trait">
+          <div class="about-trait-icon">↗</div>
+          <div>
+            <div class="about-trait-title">Results-Focused</div>
+            <div class="about-trait-text">Every design decision is made to help you convert.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="work-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Portfolio</div>
+      <h2>Recent <em>Work</em></h2>
+      <p class="section-sub">A few examples of what we've shipped for clients across industries.</p>
+    </div>
+    <div class="work-filter reveal">
+      <button class="filter-btn active" onclick="filterWork(this,'all')">All</button>
+      <button class="filter-btn" onclick="filterWork(this,'restaurant')">Restaurant</button>
+      <button class="filter-btn" onclick="filterWork(this,'business')">Business</button>
+      <button class="filter-btn" onclick="filterWork(this,'ecom')">E-Commerce</button>
+      <button class="filter-btn" onclick="filterWork(this,'golf')">Golf / Sports</button>
+    </div>
+    <div class="work-grid reveal" id="work-grid">
+      <a class="work-card" data-cat="restaurant" href="https://znthoe.github.io/Lakeside-Landing/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:block;">
+        <div class="work-arrow">↗</div>
+        <div class="work-cat">Restaurant</div>
+        <div class="work-title">Lakeside Landing</div>
+        <p class="work-desc">Waterfront bar & grill in Clear Lake, Iowa. Full menu, interactive navigation, and a nautical dark-mode aesthetic.</p>
+        <div class="work-tech"><span class="work-tag">HTML</span><span class="work-tag">CSS</span></div>
+      </a>
+      <a class="work-card" data-cat="golf" href="https://znthoe.github.io/OakHillsGolfCourse/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:block;">
+        <div class="work-arrow">↗</div>
+        <div class="work-cat">Golf Course</div>
+        <div class="work-title">Oak Hills</div>
+        <p class="work-desc">Clear Lakes nostalgic par 30 golf course with beatiful sites and easy to map course.</p>
+        <div class="work-tech"><span class="work-tag">HTML</span><span class="work-tag">CSS</span><span class="work-tag">Active Link</span></div>
+      </a>
+      <a class="work-card" data-cat="business" href="https://znthoe.github.io/RodriguezLawFirm/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:block;">
+        <div class="work-arrow">↗</div>
+        <div class="work-cat">Local Business</div>
+        <div class="work-title">Rodriguez Law Firm</div>
+        <p class="work-desc">Law firm located in Garner, IA. Specializing in Family law and strive for whats fair.</p>
+        <div class="work-tech"><span class="work-tag">HTML</span><span class="work-tag">CSS</span><span class="work-tag">JS</span></div>
+      </a>
+      <a class="work-card" data-cat="ecom">
+        <div class="work-arrow">↗</div>
+        <div class="work-cat">-----</div>
+        <div class="work-title">--------</div>
+        <p class="work-desc">-----------</p>
+        <div class="work-tech"><span class="work-tag">Shopify</span><span class="work-tag">Liquid</span><span class="work-tag">CSS</span></div>
+      </a>
+      <a class="work-card" data-cat="business">
+        <div class="work-arrow">↗</div>
+        <div class="work-cat">Professional Services</div>
+        <div class="work-title">------------</div>
+        <p class="work-desc">-----------------</p>
+        <div class="work-tech"><span class="work-tag">React</span><span class="work-tag">Tailwind</span><span class="work-tag">SEO</span></div>
+      </a>
+      <a class="work-card" data-cat="restaurant">
+        <div class="work-arrow">↗</div>
+        <div class="work-cat">Restaurant</div>
+        <div class="work-title">--------------</div>
+        <p class="work-desc">---------------</p>
+        <div class="work-tech"><span class="work-tag">HTML</span><span class="work-tag">CSS</span><span class="work-tag">OpenTable API</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-inner">
+    <div class="section-header reveal" style="text-align:center;margin-bottom:0;">
+      <div class="section-label" style="justify-content:center;">Transparent Pricing</div>
+      <h2>Simple <em>Plans</em></h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center;">No hidden fees. No hourly surprises. Just clear, flat-rate pricing.</p>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="price-tier">Starter</div>
+        <div class="price-amount"><sup>$</sup>600</div>
+        <div class="price-from">Starting Price</div>
+        <ul class="price-features">
+          <li><span class="price-check">✓</span>Custom design</li>
+          <li><span class="price-check">✓</span>Simple Page Layout</li>
+          <li><span class="price-check">✓</span>Mobile responsive</li>
+          <li><span class="price-check">✓</span>Contact form</li>
+          <li><span class="price-check">✓</span>Basic SEO setup</li>
+          <li><span class="price-check">✓</span>30-day support</li>
+          <li class="off"><span class="price-x">✗</span>E-commerce</li>
+          <li class="off"><span class="price-x">✗</span>Custom functionality</li>
+        </ul>
+        <a href="#contact" class="btn-outline" style="width:100%;justify-content:center;">Get Started</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">Most Popular</div>
+        <div class="price-tier">Professional</div>
+        <div class="price-amount"><sup>$</sup>1,000</div>
+        <div class="price-from">Starting Price</div>
+        <ul class="price-features">
+          <li><span class="price-check">✓</span>Custom design</li>
+          <li><span class="price-check">✓</span>Up to 5 pages</li>
+          <li><span class="price-check">✓</span>Mobile responsive</li>
+          <li><span class="price-check">✓</span>Advanced forms</li>
+          <li><span class="price-check">✓</span>Full SEO package</li>
+          <li><span class="price-check">✓</span>60-day support</li>
+          <li><span class="price-check">✓</span>Booking/menu system</li>
+          <li><span class="price-check">✓</span>Google Analytics / Reviews</li>
+        </ul>
+        <a href="#contact" class="btn-primary" style="width:100%;justify-content:center;display:flex;">Get Started</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-amount"><sup>$</sup>1,850<span style="font-size:1rem;color:var(--grey);margin-left:0.25rem;">+</span></div>
+        <div class="price-from">Starting Price</div>
+        <ul class="price-features">
+          <li><span class="price-check">✓</span>Custom design + branding</li>
+          <li><span class="price-check">✓</span>Unlimited pages</li>
+          <li><span class="price-check">✓</span>E-commerce store</li>
+          <li><span class="price-check">✓</span>Custom web app features</li>
+          <li><span class="price-check">✓</span>Full SEO + performance</li>
+          <li><span class="price-check">✓</span>90-day support</li>
+          <li><span class="price-check">✓</span>API integrations</li>
+          <li><span class="price-check">✓</span>Priority delivery</li>
+        </ul>
+        <a href="#contact" class="btn-outline" style="width:100%;justify-content:center;">Get Started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="test-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Client Reviews</div>
+      <h2>What Clients <em>Say</em></h2>
+    </div>
+    <div class="test-slider reveal">
+      <div class="test-track" id="test-track">
+        <div class="test-card">
+          <p class="test-text">Write in Review.</p>
+          <div class="test-author">
+            <div class="test-avatar">INT</div>
+            <div>
+              <div class="test-name">Name</div>
+              <div class="test-role">Title, Customer</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card">
+          <p class="test-text">(Reviews in Process.)</p>
+          <div class="test-author">
+            <div class="test-avatar">INT</div>
+            <div>
+              <div class="test-name">Name</div>
+              <div class="test-role">Title, Customer</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card">
+          <p class="test-text">Fast, professional, and genuinely talented. They understood exactly what I needed, never oversold me on features I didn't want, and delivered on time. I recommend Thoe to every business owner I know.</p>
+          <div class="test-author">
+            <div class="test-avatar">RK</div>
+            <div>
+              <div class="test-name">Ryan K.</div>
+              <div class="test-role">Owner, Clear Lake Contracting</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card">
+          <p class="test-text">The e-commerce store they built for us has been running flawlessly. Our sales doubled in the first month after launch. The mobile experience is especially smooth — customers comment on it all the time.</p>
+          <div class="test-author">
+            <div class="test-avatar">ST</div>
+            <div>
+              <div class="test-name">Sarah T.</div>
+              <div class="test-role">Founder, Iowa Outfitters Co.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="test-controls">
+        <button class="test-btn" onclick="slideTest(-1)">←</button>
+        <button class="test-btn" onclick="slideTest(1)">→</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="faq-inner">
+    <div class="section-header reveal" style="text-align:center;">
+      <div class="section-label" style="justify-content:center;">FAQ</div>
+      <h2>Common <em>Questions</em></h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How long does it take to build a website?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Most websites are completed in 7–14 business days from the time we receive your content and deposit. Larger projects with custom functionality may take 3–4 weeks. We'll give you a specific timeline in your proposal before any work begins.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Do I need to provide content and photos?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Ideally, yes — you know your business best. But if you need help, we can write copy for you and source high-quality stock photography. Just let us know during the discovery call and we'll factor it into the project scope.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Will my website work on phones and tablets?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Absolutely — every website we build is fully responsive and tested across all major devices and screen sizes. Mobile users account for over 60% of web traffic, so this is never an afterthought for us.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          What if I want changes after the site launches?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">All plans include a post-launch support window (30–90 days depending on plan) for minor changes and fixes. After that, you can sign up for an ongoing maintenance plan or request changes as a one-off — we're always available.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Do you offer hosting and domain setup?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">Yes. We can handle domain registration, hosting setup, and SSL certificate installation as part of the project. We'll also walk you through how to manage your hosting account so you're never dependent on us for the basics.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How do payments work?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">We typically work on a 50/50 schedule — 50% upfront to begin work and 50% upon final approval before launch. For larger projects, we can structure payments in thirds. We accept bank transfer, card, PayPal, and Venmo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner reveal">
+    <div class="contact-info">
+      <div class="section-label">Let's Build</div>
+      <h3>Ready to Start<br>Your Project?</h3>
+      <p>Tell us about your business and what you're looking to build. We'll get back to you within one business day with a plan and a quote.</p>
+      <div class="contact-items">
+        <div class="contact-item">
+          <div class="ci-icon">📧</div>
+          <div>
+            <div class="ci-label">Email</div>
+            <div class="ci-val">znthoe3@gmail.com</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">📞</div>
+          <div>
+            <div class="ci-label">Phone</div>
+            <div class="ci-val">(641) 425-7280</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">📍</div>
+          <div>
+            <div class="ci-label">Location</div>
+            <div class="ci-val">Based in: Ventura, Iowa — serving clients nationwide</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon">⏱</div>
+          <div>
+            <div class="ci-label">Response Time</div>
+            <div class="ci-val">Within 1 business day, guaranteed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form
+  class="contact-form"
+  action="https://formspree.io/f/mrevlkoo"
+  method="POST"
+>
+  <div class="cf-title">Send Us a Message</div>
+
+  <div class="form-row">
+    <div class="fg">
+      <label>First Name</label>
+      <input type="text" name="first_name" placeholder="John" required>
+    </div>
+
+    <div class="fg">
+      <label>Last Name</label>
+      <input type="text" name="last_name" placeholder="Smith" required>
+    </div>
+  </div>
+
+  <div class="fg">
+    <label>Email Address</label>
+    <input
+      type="email"
+      name="email"
+      placeholder="john@yourcompany.com"
+      required
+    >
+  </div>
+
+  <div class="fg">
+    <label>Business Name</label>
+    <input type="text" name="business_name" placeholder="Acme Co.">
+  </div>
+
+  <div class="fg">
+    <label>Service Needed</label>
+    <select name="service">
+      <option value="">Select a service</option>
+      <option>New Website (Starter)</option>
+      <option>New Website (Professional)</option>
+      <option>New Website (Enterprise)</option>
+      <option>E-Commerce Store</option>
+      <option>Website Redesign</option>
+      <option>SEO & Performance</option>
+      <option>Maintenance Plan</option>
+      <option>Not Sure Yet</option>
+    </select>
+  </div>
+
+  <div class="fg">
+    <label>Tell us about your project</label>
+    <textarea
+      name="project_details"
+      rows="4"
+      placeholder="What does your business do? What kind of website are you looking for?"
+      required
+    ></textarea>
+  </div>
+
+  <button
+    type="submit"
+    class="btn-primary"
+    style="width:100%;justify-content:center;display:flex;"
+  >
+    Send Message →
+  </button>
+</form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo" style="display:flex;align-items:center;gap:0.75rem;">
+        <div class="logo-mark"></div>
+        <div class="logo-text">TWC<span>.</span>com</div>
+      </div>
+      <p>Custom websites for businesses that take their digital presence seriously. Based in Ventura, Iowa.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#services">Web Design</a></li>
+        <li><a href="#services">Development</a></li>
+        <li><a href="#services">E-Commerce</a></li>
+        <li><a href="#services">SEO & Speed</a></li>
+        <li><a href="#services">Maintenance</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#work">Portfolio</a></li>
+        <li><a href="#process">Our Process</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="#contact">Get a Quote</a></li>
+        <li><a href="mailto:hello@thoewebconstruction.com">Email Us</a></li>
+        <li><a href="tel:6410000000">Call Us</a></li>
+        <li><a href="#contact">Free Consultation</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Thoe Website Construction · Ventura, Iowa · All rights reserved</p>
+    <div class="footer-social">
+      <a href="#" class="social-btn" title="Facebook">f</a>
+      <a href="#" class="social-btn" title="Instagram">ig</a>
+      <a href="https://www.linkedin.com/in/zach-thoe-4a96573a8/" target="_blank" rel="noopener" class="social-btn" title="LinkedIn">in</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// CURSOR — disable on touch devices
+if('ontouchstart' in window || navigator.maxTouchPoints > 0){
+  document.body.style.cursor = 'auto';
+  const c = document.getElementById('cursor');
+  const r = document.getElementById('cursor-ring');
+  if(c) c.style.display='none';
+  if(r) r.style.display='none';
+}
+
+// HAMBURGER
+const hamburger = document.getElementById('navHamburger');
+const navMenu = document.getElementById('navLinks');
+if(hamburger){
+  hamburger.addEventListener('click',()=>{
+    hamburger.classList.toggle('open');
+    navMenu.classList.toggle('open');
+  });
+  document.querySelectorAll('.nav-link-item').forEach(link=>{
+    link.addEventListener('click',()=>{
+      hamburger.classList.remove('open');
+      navMenu.classList.remove('open');
+    });
+  });
+}
+
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button,.work-card,.faq-q,.contact-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.width='16px';cursor.style.height='16px';
+    ring.style.width='48px';ring.style.height='48px';
+    ring.style.borderColor='rgba(96,165,250,0.8)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.width='10px';cursor.style.height='10px';
+    ring.style.width='34px';ring.style.height='34px';
+    ring.style.borderColor='rgba(59,130,246,0.5)';
+  });
+});
+
+// SERVICE TABS
+function showTab(id){
+  document.querySelectorAll('.stab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.stab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[onclick="showTab('${id}')"]`).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// WORK FILTER
+function filterWork(btn,cat){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.work-card').forEach(card=>{
+    if(cat==='all'||card.dataset.cat===cat){
+      card.style.display='block';
+    } else {
+      card.style.display='none';
+    }
+  });
+}
+
+// TESTIMONIAL SLIDER
+let testPos=0;
+function slideTest(dir){
+  const track=document.getElementById('test-track');
+  const cards=track.querySelectorAll('.test-card');
+  const max=cards.length-2;
+  testPos=Math.max(0,Math.min(max,testPos+dir));
+  const cardW=cards[0].offsetWidth+24;
+  track.style.transform=`translateX(-${testPos*cardW}px)`;
+  track.style.transition='transform 0.4s ease';
+}
+
+// FAQ
+function toggleFaq(el){
+  const item=el.parentElement;
+  const wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(f=>f.classList.remove('open'));
+  if(!wasOpen) item.classList.add('open');
+}
+
+// CONTACT SUBMIT
+function submitContact(){
+  document.getElementById('contact-confirm').style.display='block';
+}
+
+// SCROLL REVEAL
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'),i*80);
+    }
+  });
+},{threshold:0.1});
+reveals.forEach(r=>obs.observe(r));
+
+// NAV ACTIVE
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-80)cur=s.id;});
+  navLinks.forEach(a=>{
+    const isActive=a.getAttribute('href')==='#'+cur;
+    if(!a.classList.contains('nav-cta'))
+      a.style.color=isActive?'var(--white-pure)':'';
+  });
+});
+</script>
+</body>
+</html>
